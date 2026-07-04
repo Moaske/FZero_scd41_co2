@@ -1,4 +1,6 @@
-# Flipper Zero SCD30 CO2 Monitor
+# Flipper Zero SCD41 CO2 Monitor
+
+The plan is to upgrade this code to the SCD41 sensor.
 
 ![Screenshot](docs/screenshot.jpg)
 
