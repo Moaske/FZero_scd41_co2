@@ -1,6 +1,6 @@
 # Flipper Zero SCD41 CO2 Monitor
 
-The plan is to upgrade this code to the SCD41 sensor.
+Port driver from SCD30 to SCD41.
 
 ![Screenshot](docs/screenshot.jpg)
 
