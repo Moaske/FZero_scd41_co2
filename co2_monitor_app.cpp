@@ -8,13 +8,13 @@
 
 #include <string>
 
-#include "flipperscd30.h"
+#include "flipperscd41.h"
 #include "csv_writer.h"
 
 struct CO2Monitor {
     FuriMessageQueue* event_queue;
 
-    SCD30Data data;
+    SCD41Data data;
     ViewPort* view_port;
     Gui* gui;
     CsvWriter* csv;
@@ -108,8 +108,8 @@ extern "C" int32_t co2_monitor_app(void* p) {
     co2_monitor->event_queue = furi_message_queue_alloc(8, sizeof(InputEvent));
     gui_add_view_port(co2_monitor->gui, co2_monitor->view_port, GuiLayerFullscreen);
 
-    FlipperSCD30WorkerThread scd30_worker(5);
-    scd30_worker.start();
+    FlipperSCD41WorkerThread scd41_worker(5);
+    scd41_worker.start();
 
     bool running = true;
     InputEvent event;
@@ -120,13 +120,16 @@ extern "C" int32_t co2_monitor_app(void* p) {
             if(event.type == InputTypePress && event.key == InputKeyBack) {
                 running = false;
             } else if(event.type == InputTypeLong && event.key == InputKeyUp) {
-                // Calibrate to 420ppm (average outside value)
-                scd30_worker.calibrate_to(420);
+                // Calibrate to 420ppm (average outside value).
+                // Note: on the SCD41 this pauses periodic measurement for a
+                // few seconds while forced recalibration runs, unlike the
+                // SCD30 which could calibrate without interrupting readings.
+                scd41_worker.calibrate_to(420);
             }
         }
 
-        if(scd30_worker.has_data()) {
-            SCD30Data new_data = scd30_worker.get_data();
+        if(scd41_worker.has_data()) {
+            SCD41Data new_data = scd41_worker.get_data();
 
             if(co2_monitor->last_data_ts != new_data.ts) {
                 co2_monitor->data = new_data;
@@ -144,7 +147,7 @@ extern "C" int32_t co2_monitor_app(void* p) {
         view_port_update(co2_monitor->view_port);
     }
 
-    scd30_worker.stop();
+    scd41_worker.stop();
 
     // Turn off LED
     furi_hal_light_set(LightRed, 0);
