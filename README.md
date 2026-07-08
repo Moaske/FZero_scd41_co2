@@ -27,3 +27,10 @@ I then took Matthinc's repo to adapt it to the SCD41 sensor
 Place the sensor outside for at least 5 minutes - push and hold the "UP" button. The CO2 sensor will calibrate to 420 ppm.
 
 <img src="https://github.com/Moaske/FZero_scd41_co2/blob/main/docs/PXL_20260708_083506756.jpeg" width=800></img>
+
+## Enclosure
+
+Currently working on 3D Printed enclosure for the small Pimoroni sensor. Will also publish .STL files as soon as I have a satisfactory design.
+So far this is the first prototype:
+
+<img src="https://github.com/Moaske/FZero_scd41_co2/blob/main/docs/enclosure_prototyping.jpg"></img>
