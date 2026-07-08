@@ -1,6 +1,6 @@
 # Flipper Zero SCD41 CO2 Monitor
 
-CO2 monitor and data logger for Flipper Zero with SCD41 sensor.
+CO2 monitor and data logger for Flipper Zero with (Pimoroni breakout) SCD41 sensor.
 
 <img src="https://github.com/Moaske/FZero_scd41_co2/blob/main/docs/scd41_co2meter_flipperzero.jpg"></img>
 
