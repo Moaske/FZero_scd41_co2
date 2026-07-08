@@ -159,7 +159,7 @@ SCD41Data FlipperSCD41::read_measurements() {
 // Tune this after calibrating against a reference thermometer -- see the
 // procedure in the project README / commit message. Factory default is
 // 4.0C; self-heating in your specific enclosure may need more or less.
-static constexpr float SCD41_TEMPERATURE_OFFSET_C = 4.0f;
+static constexpr float SCD41_TEMPERATURE_OFFSET_C = 7.0f;
 
 static int32_t run(void* context) {
     FlipperSCD41WorkerThread* worker_context =
