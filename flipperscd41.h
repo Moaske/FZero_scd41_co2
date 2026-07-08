@@ -34,6 +34,7 @@ public:
     bool data_ready();
     bool perform_forced_recalibration(uint16_t target_ppm);
     bool set_automatic_self_calibration(bool enable);
+    bool set_temperature_offset(float offset_celsius);
 
     SCD41Data read_measurements();
 };

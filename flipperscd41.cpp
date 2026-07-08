@@ -118,6 +118,15 @@ bool FlipperSCD41::set_automatic_self_calibration(bool enable) {
     return send_command({0x24, 0x16}, {UINT16_MSBS(val), UINT16_LSBS(val)});
 }
 
+bool FlipperSCD41::set_temperature_offset(float offset_celsius) {
+    // Only valid in idle mode (call stop_periodic_measurement() first).
+    // Ticks-per-degree conversion mirrors the temperature decode formula:
+    // temp = -45 + 175 * raw/65536, so an additive offset in degrees maps
+    // to raw ticks as offset_ticks = offset_celsius * 65536 / 175.
+    uint16_t ticks = static_cast<uint16_t>(offset_celsius * 65536.0f / 175.0f);
+    return send_command({0x24, 0x1d}, {UINT16_MSBS(ticks), UINT16_LSBS(ticks)});
+}
+
 SCD41Data FlipperSCD41::read_measurements() {
     SCD41Data result;
     uint8_t buffer[9];
@@ -139,17 +148,26 @@ SCD41Data FlipperSCD41::read_measurements() {
         DateTime datetime;
         furi_hal_rtc_get_datetime(&datetime);
 
-        auto pad2 = [](int n) { return (n < 10 ? "0" : "") + std::to_string(n); };
-        result.ts = std::to_string(datetime.year) + "-" + pad2(datetime.month) + "-" + pad2(datetime.day) +
-                    " " + pad2(datetime.hour) + ":" + pad2(datetime.minute) + ":" + pad2(datetime.second);
+        result.ts = std::to_string(datetime.year) + "-" + std::to_string(datetime.month) + "-" +
+                    std::to_string(datetime.day) + " " + std::to_string(datetime.hour) + ":" +
+                    std::to_string(datetime.minute) + ":" + std::to_string(datetime.second);
     }
 
     return result;
 }
 
+// Tune this after calibrating against a reference thermometer -- see the
+// procedure in the project README / commit message. Factory default is
+// 4.0C; self-heating in your specific enclosure may need more or less.
+static constexpr float SCD41_TEMPERATURE_OFFSET_C = 4.0f;
+
 static int32_t run(void* context) {
     FlipperSCD41WorkerThread* worker_context =
         reinterpret_cast<FlipperSCD41WorkerThread*>(context);
+
+    // Sensor boots in idle mode, so this is the only safe window to set the
+    // offset without an explicit stop_periodic_measurement() call.
+    worker_context->scd41.set_temperature_offset(SCD41_TEMPERATURE_OFFSET_C);
 
     worker_context->scd41.start_periodic_measurement();
     // First measurement isn't ready until ~5s after start.
