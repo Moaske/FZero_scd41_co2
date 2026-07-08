@@ -136,7 +136,7 @@ SCD41Data FlipperSCD41::read_measurements() {
         result.temperature = -45.0f + 175.0f * (static_cast<float>(temp_raw) / 65536.0f);
         result.humidity = 100.0f * (static_cast<float>(rh_raw) / 65536.0f);
 
-        FuriHalRtcDateTime datetime;
+        DateTime datetime;
         furi_hal_rtc_get_datetime(&datetime);
 
         result.ts = std::to_string(datetime.year) + "-" + std::to_string(datetime.month) + "-" +
