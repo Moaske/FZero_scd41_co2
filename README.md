@@ -38,12 +38,14 @@ Important  note on the SCD41 calibration:
 
 The SCD41 has a known temperature abberation that is caused by the pre-heating of the sensor itself. Depending on how you deploy it (in a very open or more closed enclosure), you may need to tweak this line of code in `flipperscd41.cpp` :
 
-  ``// Tune this after calibrating against a reference thermometer -- see the
-    // procedure in the project README / commit message. Factory default is
-    // 4.0C; self-heating in your specific enclosure may need more or less.``
-   `static constexpr float SCD41_TEMPERATURE_OFFSET_C = 4.0f;`
+``// Tune this after calibrating against a reference thermometer -- see the
+// procedure in the project README / commit message. Factory default is
+// 4.0C; self-heating in your specific enclosure may need more or less.
+static constexpr float SCD41_TEMPERATURE_OFFSET_C = 5.0f;``
 
-Where 4.0f is the default offset, which you can increment with 1 for every degree you want to lower the reading.
+
+Where 4.0f is the default offset, which you can increment with 1 for every degree you want to lower the Temp reading.
+Check with a reference thermometer for at least 5 to 10 minutes.
 
 ## Enclosure
 
