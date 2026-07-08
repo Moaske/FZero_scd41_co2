@@ -139,9 +139,9 @@ SCD41Data FlipperSCD41::read_measurements() {
         DateTime datetime;
         furi_hal_rtc_get_datetime(&datetime);
 
-        result.ts = std::to_string(datetime.year) + "-" + std::to_string(datetime.month) + "-" +
-                    std::to_string(datetime.day) + " " + std::to_string(datetime.hour) + ":" +
-                    std::to_string(datetime.minute) + ":" + std::to_string(datetime.second);
+        auto pad2 = [](int n) { return (n < 10 ? "0" : "") + std::to_string(n); };
+        result.ts = std::to_string(datetime.year) + "-" + pad2(datetime.month) + "-" + pad2(datetime.day) +
+                    " " + pad2(datetime.hour) + ":" + pad2(datetime.minute) + ":" + pad2(datetime.second);
     }
 
     return result;
