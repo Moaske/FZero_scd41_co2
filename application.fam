@@ -1,6 +1,6 @@
 App(
     appid="scd41_co2",
-    name="SCD41 CO2 Monitor",
+    name="CO2 Monitor [SCD41]",
     apptype=FlipperAppType.EXTERNAL,
     entry_point="co2_monitor_app",
     cdefines=["APP_CO2_MONITOR"],
