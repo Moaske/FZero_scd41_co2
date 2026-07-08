@@ -25,6 +25,14 @@ I then took Matthinc's repo to adapt it to the SCD41 sensor
 ## Calibrate sensor
 
 Place the sensor outside for at least 5 minutes - push and hold the "UP" button. The CO2 sensor will calibrate to 420 ppm.
+Important  note on the SCD41 calibration:
+
+    // FRC is very different from the SCD30's calibrate command:
+    //  - the sensor must be in idle mode (call stop_periodic_measurement()
+    //    first), it will NACK this while periodic measurement is running
+    //  - the sensor should have been running continuously for >= 3 minutes
+    //    before this is called, for the correction to be meaningful
+    //  - it takes ~400ms to execute, much longer than a normal command
 
 <img src="https://github.com/Moaske/FZero_scd41_co2/blob/main/docs/PXL_20260708_083506756.jpeg" width=800></img>
 
