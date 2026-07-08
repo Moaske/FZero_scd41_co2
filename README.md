@@ -36,6 +36,15 @@ Important  note on the SCD41 calibration:
 
 <img src="https://github.com/Moaske/FZero_scd41_co2/blob/main/docs/PXL_20260708_083506756.jpeg" width=800></img>
 
+The SCD41 has a known temperature abberation that is caused by the pre-heating of the sensor itself. Depending on how you deploy it (in a very open or more closed enclosure), you may need to tweak this line of code in `flipperscd41.cpp` :
+
+  ``// Tune this after calibrating against a reference thermometer -- see the
+    // procedure in the project README / commit message. Factory default is
+    // 4.0C; self-heating in your specific enclosure may need more or less.``
+   `static constexpr float SCD41_TEMPERATURE_OFFSET_C = 4.0f;`
+
+Where 4.0f is the default offset, which you can increment with 1 for every degree you want to lower the reading.
+
 ## Enclosure
 
 Currently working on 3D Printed enclosure for the small Pimoroni sensor. Will also publish .STL files as soon as I have a satisfactory design.
