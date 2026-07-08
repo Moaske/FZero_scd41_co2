@@ -1,16 +1,16 @@
 # Flipper Zero SCD41 CO2 Monitor
 
-Port driver from SCD30 to SCD41.
+CO2 monitor and data logger for Flipper Zero with SCD41 sensor.
 
-![Screenshot](docs/screenshot.jpg)
+The original repo by https://github.com/matthinc/fz_scd30_co2 started as a port of https://github.com/thzinc/flipperzero-firmware to a recent version and evolved to a completetly new project. 
 
-CO2 monitor and data logger for Flipper Zero. This started as a port of https://github.com/thzinc/flipperzero-firmware to a recent version and evolved to a completetly new project.
+I forked the Matthinc repo to adapt it to the SCD41 sensor
 
 ## Wiring
-- SCD30 VIN <--> 3.3V
-- SCD30 GND <--> GND
-- SCD30 SCL <--> PC0
-- SCD30 SDA <--> PC1
+- SCD41 VIN <--> 3.3V
+- SCD41 GND <--> GND
+- SCD41 SCL <--> PC0
+- SCD41 SDA <--> PC1
 
 ## Features
 
