@@ -2,6 +2,8 @@
 
 CO2 monitor and data logger for Flipper Zero with SCD41 sensor.
 
+<img src="https://github.com/Moaske/FZero_scd41_co2/blob/main/docs/scd41_co2meter_flipperzero.jpg"></img>
+
 The original repo by https://github.com/matthinc/fz_scd30_co2, of which this is a fork, started as a port of https://github.com/thzinc/flipperzero-firmware to a recent version and evolved to a completetly new project. 
 
 I then took Matthinc's repo to adapt it to the SCD41 sensor
