@@ -9,10 +9,12 @@ The original repo by https://github.com/matthinc/fz_scd30_co2, of which this is 
 I then forked Matthinc's repo to adapt it to the SCD41 sensor
 
 ## Wiring
-- SCD41 VIN <--> 3.3V
-- SCD41 GND <--> GND
-- SCD41 SCL <--> PC0
-- SCD41 SDA <--> PC1
+- SCD41 VIN <--> 3.3V  <-->  RED
+- SCD41 GND <--> GND  <-->  BLACK
+- SCD41 SCL <--> PC0  <-->  BLUE
+- SCD41 SDA <--> PC1  <-->  YELLOW
+
+(Colours refer to Qwiic JST cable on the connector)
 
 ## Features
 
