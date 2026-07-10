@@ -4,7 +4,7 @@
 
 ## Prerequisites:
 - 3D printer (duh)
-- The Pimoroni SCD41 CO2 breakout board (duh2 ;)
+- The Pimoroni SCD41 CO2 breakout board (duh2 ;) https://shop.pimoroni.com/products/scd41-co2-sensor-breakout?variant=39652270833747
 - 4x M2.5 hex-nut bolts
 - 10pin header male
 - One short four lane Qwiic JST cable
