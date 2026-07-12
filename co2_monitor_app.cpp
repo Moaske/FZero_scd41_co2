@@ -11,6 +11,11 @@
 #include "flipperscd41.h"
 #include "csv_writer.h"
 
+enum class AppScreen {
+    Wiring,
+    Main,
+};
+
 struct CO2Monitor {
     FuriMessageQueue* event_queue;
 
@@ -19,6 +24,7 @@ struct CO2Monitor {
     Gui* gui;
     CsvWriter* csv;
     std::string last_data_ts;
+    AppScreen screen = AppScreen::Wiring;
 };
 
 static void update_led(int co2_level) {
@@ -49,9 +55,22 @@ static void progress_bar(Canvas* canvas, int x, int y, int w, int progress, int 
     canvas_draw_rbox(canvas, x + 2, y + 2, (progress / static_cast<double>(max)) * (w - 4), 3, 0);
 }
 
-static void draw_callback(Canvas* canvas, void* ctx) {
-    CO2Monitor* context = static_cast<CO2Monitor*>(ctx);
+static void draw_wiring_screen(Canvas* canvas) {
+    canvas_clear(canvas);
 
+    canvas_set_font(canvas, FontPrimary);
+    canvas_draw_str_aligned(canvas, 64, 2, AlignCenter, AlignTop, "Wire up SCD41 first");
+
+    canvas_set_font(canvas, FontSecondary);
+    canvas_draw_str(canvas, 2, 20, "GND  -> pin 11 (black)");
+    canvas_draw_str(canvas, 2, 30, "3.3V -> pin 9  (red)");
+    canvas_draw_str(canvas, 2, 40, "SDA  -> pin 15 (blue)");
+    canvas_draw_str(canvas, 2, 50, "SCL  -> pin 16 (yellow)");
+
+    canvas_draw_str_aligned(canvas, 64, 62, AlignCenter, AlignBottom, "Press OK when ready");
+}
+
+static void draw_main_screen(Canvas* canvas, CO2Monitor* context) {
     int co2 = static_cast<int>(context->data.co2_ppm);
     int hum = static_cast<int>(context->data.humidity);
 
@@ -81,8 +100,16 @@ static void draw_callback(Canvas* canvas, void* ctx) {
         AlignLeft,
         AlignTop,
         (std::string(temp_str) + " C, " + std::to_string(hum) + " % - Hold UP to cal.").c_str());
-    
-    // Info
+}
+
+static void draw_callback(Canvas* canvas, void* ctx) {
+    CO2Monitor* context = static_cast<CO2Monitor*>(ctx);
+
+    if(context->screen == AppScreen::Wiring) {
+        draw_wiring_screen(canvas);
+    } else {
+        draw_main_screen(canvas, context);
+    }
 }
 
 static void input_callback(InputEvent* input, void* ctx) {
@@ -105,12 +132,11 @@ extern "C" int32_t co2_monitor_app(void* p) {
 
     gui_add_view_port(co2_monitor->gui, co2_monitor->view_port, GuiLayerFullscreen);
 
-    co2_monitor->gui = static_cast<Gui*>(furi_record_open("gui"));
-    co2_monitor->event_queue = furi_message_queue_alloc(8, sizeof(InputEvent));
-    gui_add_view_port(co2_monitor->gui, co2_monitor->view_port, GuiLayerFullscreen);
-
+    // Sensor worker is only constructed here -- constructing it does not
+    // touch I2C. It's only start()-ed once the user confirms wiring on the
+    // Wiring screen, so nothing talks to the bus until then.
     FlipperSCD41WorkerThread scd41_worker(5);
-    scd41_worker.start();
+    bool sensor_started = false;
 
     bool running = true;
     InputEvent event;
@@ -120,7 +146,15 @@ extern "C" int32_t co2_monitor_app(void* p) {
         if(status == FuriStatusOk) {
             if(event.type == InputTypePress && event.key == InputKeyBack) {
                 running = false;
-            } else if(event.type == InputTypeLong && event.key == InputKeyUp) {
+            } else if(
+                co2_monitor->screen == AppScreen::Wiring && event.type == InputTypePress &&
+                event.key == InputKeyOk) {
+                co2_monitor->screen = AppScreen::Main;
+                scd41_worker.start();
+                sensor_started = true;
+            } else if(
+                co2_monitor->screen == AppScreen::Main && event.type == InputTypeLong &&
+                event.key == InputKeyUp) {
                 // Calibrate to 420ppm (average outside value).
                 // Note: on the SCD41 this pauses periodic measurement for a
                 // few seconds while forced recalibration runs, unlike the
@@ -129,7 +163,7 @@ extern "C" int32_t co2_monitor_app(void* p) {
             }
         }
 
-        if(scd41_worker.has_data()) {
+        if(sensor_started && scd41_worker.has_data()) {
             SCD41Data new_data = scd41_worker.get_data();
 
             if(co2_monitor->last_data_ts != new_data.ts) {
@@ -148,7 +182,9 @@ extern "C" int32_t co2_monitor_app(void* p) {
         view_port_update(co2_monitor->view_port);
     }
 
-    scd41_worker.stop();
+    if(sensor_started) {
+        scd41_worker.stop();
+    }
 
     // Turn off LED
     furi_hal_light_set(LightRed, 0);
