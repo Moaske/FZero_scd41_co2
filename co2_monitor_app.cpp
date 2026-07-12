@@ -73,7 +73,7 @@ static void draw_callback(Canvas* canvas, void* ctx) {
     // Temp / humidity
     canvas_set_font(canvas, FontSecondary);
     char temp_str[8];
-    snprintf(temp_str, sizeof(temp_str), "%.1f", context->data.temperature);
+    snprintf(temp_str, sizeof(temp_str), "%.1f", static_cast<double>(context->data.temperature));
     canvas_draw_str_aligned(
         canvas,
         5,
