@@ -11,8 +11,8 @@ jobs:
         uses: flipperdevices/flipperzero-ufbt-action@v0.1
         id: build-app
         with:
-          # Set to 'release' to build for latest published release version
-          sdk-channel: release
+          sdk-url: https://github.com/DarkFlippers/unleashed-firmware/releases/download/unlshd-089/flipper-z-f7-sdk-unlshd-089.zip
+          sdk-hw-target: f7
       - name: Upload app artifacts
         uses: actions/upload-artifact@v3
         with:
