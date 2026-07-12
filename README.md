@@ -6,7 +6,10 @@ CO2 monitor and data logger for Flipper Zero with (Pimoroni breakout) SCD41 sens
 
 The original repo by https://github.com/matthinc/fz_scd30_co2, of which this is a fork, started as a port of https://github.com/thzinc/flipperzero-firmware to a recent version and evolved to a completetly new project. 
 
-I then forked Matthinc's repo to adapt it to the SCD41 sensor. Currently at version 1.1.0
+I then forked Matthinc's repo to adapt it to the SCD41 sensor. Currently version 1.2.0
+### v1.2
+- Added wiring screen at startup
+### v1.1
 - The CSV logging was simplified
 - Temperature now shows one decimal accuracy.
 
