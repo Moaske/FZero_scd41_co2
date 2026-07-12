@@ -53,7 +53,6 @@ static void draw_callback(Canvas* canvas, void* ctx) {
     CO2Monitor* context = static_cast<CO2Monitor*>(ctx);
 
     int co2 = static_cast<int>(context->data.co2_ppm);
-    int temp = static_cast<int>(context->data.temperature);
     int hum = static_cast<int>(context->data.humidity);
 
     update_led(co2);
@@ -73,14 +72,16 @@ static void draw_callback(Canvas* canvas, void* ctx) {
 
     // Temp / humidity
     canvas_set_font(canvas, FontSecondary);
+    char temp_str[8];
+    snprintf(temp_str, sizeof(temp_str), "%.1f", context->data.temperature);
     canvas_draw_str_aligned(
         canvas,
         5,
         55,
         AlignLeft,
         AlignTop,
-        (std::to_string(temp) + " C, " + std::to_string(hum) + " % - Hold UP to calib.").c_str());
-
+        (std::string(temp_str) + " C, " + std::to_string(hum) + " % - Hold UP to cal.").c_str());
+    
     // Info
 }
 
