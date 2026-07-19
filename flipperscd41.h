@@ -48,12 +48,14 @@ public:
     void start();
 
     void calibrate_to(uint16_t ppm);
+    bool is_calibrating();
 
     SCD41Data get_data();
     bool has_data();
 
     int interval;
     uint16_t next_calibration = 0;
+    bool calibrating = false;
     bool running = false;
     bool data_available = false;
     FuriThread* thread;
