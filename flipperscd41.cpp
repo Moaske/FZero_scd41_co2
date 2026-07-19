@@ -191,13 +191,13 @@ static int32_t run(void* context) {
             worker_context->next_calibration = 0;
             worker_context->scd41.start_periodic_measurement();
             furi_delay_ms(5000);
+            worker_context->calibrating = false;
         }
 
         furi_delay_ms(worker_context->interval);
     }
 
     worker_context->scd41.stop_periodic_measurement();
-    worker_context->calibrating = false;
 
     return 0;
 }
@@ -227,6 +227,11 @@ void FlipperSCD41WorkerThread::start() {
 
 void FlipperSCD41WorkerThread::calibrate_to(uint16_t ppm) {
     next_calibration = ppm;
+    calibrating = true;
+}
+
+bool FlipperSCD41WorkerThread::is_calibrating() {
+    return calibrating;
 }
 
 bool FlipperSCD41WorkerThread::has_data() {
