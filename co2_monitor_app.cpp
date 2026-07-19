@@ -161,3 +161,62 @@ extern "C" int32_t co2_monitor_app(void* p) {
             } else if(
                 co2_monitor->screen == AppScreen::Wiring && event.type == InputTypePress &&
                 event.key == InputKeyOk) {
+                co2_monitor->screen = AppScreen::Main;
+                scd41_worker.start();
+                sensor_started = true;
+            } else if(
+                co2_monitor->screen == AppScreen::Main && event.type == InputTypeLong &&
+                event.key == InputKeyUp) {
+                // Calibrate to 420ppm (average outside value).
+                // Note: on the SCD41 this pauses periodic measurement for a
+                // few seconds while forced recalibration runs, unlike the
+                // SCD30 which could calibrate without interrupting readings.
+                scd41_worker.calibrate_to(420);
+            }
+        }
+
+        if(sensor_started) {
+            bool now_calibrating = scd41_worker.is_calibrating();
+            if(co2_monitor->calibrating && !now_calibrating) {
+                // Just finished -- latch "Calibrated" for the rest of this run.
+                co2_monitor->calibrated = true;
+            }
+            co2_monitor->calibrating = now_calibrating;
+        }
+
+        if(sensor_started && scd41_worker.has_data()) {
+            SCD41Data new_data = scd41_worker.get_data();
+
+            if(co2_monitor->last_data_ts != new_data.ts) {
+                co2_monitor->data = new_data;
+                co2_monitor->last_data_ts = new_data.ts;
+
+                co2_monitor->csv->add_row({
+                    new_data.ts,
+                    std::to_string(new_data.co2_ppm),
+                    std::to_string(new_data.temperature),
+                    std::to_string(new_data.humidity),
+                });
+            }
+        }
+
+        view_port_update(co2_monitor->view_port);
+    }
+
+    if(sensor_started) {
+        scd41_worker.stop();
+    }
+
+    // Turn off LED
+    furi_hal_light_set(LightRed, 0);
+    furi_hal_light_set(LightGreen, 0);
+    furi_hal_light_set(LightBlue, 0);
+
+    gui_remove_view_port(co2_monitor->gui, co2_monitor->view_port);
+    view_port_free(co2_monitor->view_port);
+    furi_record_close("gui");
+
+    delete co2_monitor->csv;
+    delete co2_monitor;
+    return 0;
+}
