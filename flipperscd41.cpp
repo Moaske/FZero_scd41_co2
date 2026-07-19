@@ -197,6 +197,7 @@ static int32_t run(void* context) {
     }
 
     worker_context->scd41.stop_periodic_measurement();
+    worker_context->calibrating = false;
 
     return 0;
 }
