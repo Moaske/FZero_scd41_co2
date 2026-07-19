@@ -9,5 +9,5 @@ App(
     order=20,
     fap_icon="co2.png",
     fap_category="Tools",
-    fap_version=(1, 2),
+    fap_version=(1, 3),
 )
