@@ -25,6 +25,8 @@ struct CO2Monitor {
     CsvWriter* csv;
     std::string last_data_ts;
     AppScreen screen = AppScreen::Wiring;
+    bool calibrating = false;
+    bool calibrated = false;
 };
 
 static void update_led(int co2_level) {
@@ -93,13 +95,23 @@ static void draw_main_screen(Canvas* canvas, CO2Monitor* context) {
     canvas_set_font(canvas, FontSecondary);
     char temp_str[8];
     snprintf(temp_str, sizeof(temp_str), "%.1f", static_cast<double>(context->data.temperature));
+
+    std::string status;
+    if(context->calibrating) {
+        status = "Calibrating...";
+    } else if(context->calibrated) {
+        status = "Calibrated";
+    } else {
+        status = "Hold UP to cal.";
+    }
+
     canvas_draw_str_aligned(
         canvas,
         5,
         55,
         AlignLeft,
         AlignTop,
-        (std::string(temp_str) + " C, " + std::to_string(hum) + " % - Hold UP to cal.").c_str());
+        (std::string(temp_str) + " C, " + std::to_string(hum) + " % - " + status).c_str());
 }
 
 static void draw_callback(Canvas* canvas, void* ctx) {
@@ -149,53 +161,3 @@ extern "C" int32_t co2_monitor_app(void* p) {
             } else if(
                 co2_monitor->screen == AppScreen::Wiring && event.type == InputTypePress &&
                 event.key == InputKeyOk) {
-                co2_monitor->screen = AppScreen::Main;
-                scd41_worker.start();
-                sensor_started = true;
-            } else if(
-                co2_monitor->screen == AppScreen::Main && event.type == InputTypeLong &&
-                event.key == InputKeyUp) {
-                // Calibrate to 420ppm (average outside value).
-                // Note: on the SCD41 this pauses periodic measurement for a
-                // few seconds while forced recalibration runs, unlike the
-                // SCD30 which could calibrate without interrupting readings.
-                scd41_worker.calibrate_to(420);
-            }
-        }
-
-        if(sensor_started && scd41_worker.has_data()) {
-            SCD41Data new_data = scd41_worker.get_data();
-
-            if(co2_monitor->last_data_ts != new_data.ts) {
-                co2_monitor->data = new_data;
-                co2_monitor->last_data_ts = new_data.ts;
-
-                co2_monitor->csv->add_row({
-                    new_data.ts,
-                    std::to_string(new_data.co2_ppm),
-                    std::to_string(new_data.temperature),
-                    std::to_string(new_data.humidity),
-                });
-            }
-        }
-
-        view_port_update(co2_monitor->view_port);
-    }
-
-    if(sensor_started) {
-        scd41_worker.stop();
-    }
-
-    // Turn off LED
-    furi_hal_light_set(LightRed, 0);
-    furi_hal_light_set(LightGreen, 0);
-    furi_hal_light_set(LightBlue, 0);
-
-    gui_remove_view_port(co2_monitor->gui, co2_monitor->view_port);
-    view_port_free(co2_monitor->view_port);
-    furi_record_close("gui");
-
-    delete co2_monitor->csv;
-    delete co2_monitor;
-    return 0;
-}
