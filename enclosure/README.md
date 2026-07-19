@@ -16,8 +16,11 @@
 
 <img src="https://github.com/Moaske/FZero_scd41_co2/blob/main/enclosure/components_before_assembly.jpg"></img>
 
-- Remove the unused pins, or at least the two pins that are next to the VCC pin.
-- Plug in the Qwiic connector and fold the wires around the back, and back up on the right (see images for wire routing)
+- Remove the unused pins, or at least the two pins that are next to the VCC pin, because there will be a screw at pins 2 and 3 spot. Route the VCC nicely around that :-)
+
+<img src="https://github.com/Moaske/FZero_scd41_co2/blob/main/enclosure/wiring_rounting.jpg"></img>
+
+- Plug in the Qwiic connector and fold the wires around the back, and back up on the right (see images above for wire routing # half assembly is of first prototype-back, so ingore dimensions to the right)
 - Carefully place the lid over everything (pre screw the bolts to align) while making sure no wires or components get squashed and screw tight.
 
 <img src="https://github.com/Moaske/FZero_scd41_co2/blob/main/enclosure/assembled_module_with_carrier_case.jpg"></img>
